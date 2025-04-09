@@ -1,0 +1,35 @@
+---
+- name: "Check for ctop installation"
+  ansible.builtin.stat:
+    path: '{{ ctop_install_path }}/ctop'
+  changed_when: false
+  register: ctop_binary
+
+- name: "Installation"
+  when: not ctop_binary.stat.exists or ctop_force_install|bool
+  block:
+    - name: "Install by repository"
+      when: ctop_install_mode == 'repo'
+      block:
+        - name: "Debian tasks"
+          ansible.builtin.include_tasks: setup-debian.yml
+          when:
+            - ansible_os_family == 'Debian'
+
+        - name: "Redhat tasks"
+          ansible.builtin.include_tasks: setup-redhat.yml
+          when:
+            - ansible_os_family == 'RedHat' or ansible_distribution == 'OracleLinux'
+
+        - name: "Install ctop package"
+          ansible.builtin.package:
+            name: "ctop"
+            state: present
+          register: pkg_result
+          retries: 12
+          delay: 10
+          until: pkg_result is success
+
+    - name: "Install by sources"
+      ansible.builtin.include_tasks: src.yml
+      when: ctop_install_mode == 'src'

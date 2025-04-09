@@ -1,0 +1,36 @@
+---
+- name: "DEBIAN | Install requirements package."
+  ansible.builtin.package:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+  register: pkg_result
+  retries: 12
+  delay: 10
+  until: pkg_result is success
+
+- name: "DEBIAN | Add ctop apt signing key."
+  ansible.builtin.get_url:
+    url: "{{ ctop_repository_key }}"
+    dest: /etc/apt/trusted.gpg.d/ctop.asc
+    mode: '0644'
+  when: ctop_repository_key is defined and ctop_repository_key|length > 0
+
+- name: "DEBIAN | Add ctop repo to apt list"
+  ansible.builtin.apt_repository:
+    repo: "{{ ctop_repository }}"
+    state: present
+    filename: "{{ ctop_repository_file }}"
+  when: ctop_repository is defined and ctop_repository|length > 0
+
+- name: "DEBIAN | Update apt cache."
+  ansible.builtin.apt:
+    update_cache: true
+  changed_when: false
+  register: pkg_result
+  retries: 12
+  delay: 10
+  until: pkg_result is success

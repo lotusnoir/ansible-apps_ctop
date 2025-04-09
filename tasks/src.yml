@@ -1,0 +1,8 @@
+---
+- name: "Downnload ctop"
+  ansible.builtin.get_url:
+    url: "{{ ctop_url }}"
+    dest: "{{ ctop_install_path }}/ctop"
+    mode: '0755'
+    owner: root
+    group: root
