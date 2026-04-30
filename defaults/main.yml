@@ -9,5 +9,5 @@ ctop_install_path: "/usr/local/bin"
 
 ### When install mode is "repo"
 ctop_repository_key: "https://azlux.fr/repo.gpg.key"
-ctop_repository: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/ctop.asc] http://packages.azlux.fr/debian {{ ansible_distribution_release }} main"
+ctop_repository: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/ctop.asc] http://packages.azlux.fr/debian {{ ansible_facts.distribution_release }} main"
 ctop_repository_file: "ctop"
